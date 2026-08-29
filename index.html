@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trinity FX Global — Meet Trader Algo Bot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0a0d;
+    --panel:#111318;
+    --panel-2:#161a21;
+    --hair: rgba(201,162,39,0.16);
+    --gold:#c9a227;
+    --gold-bright:#e8c65a;
+    --cream:#f3ead3;
+    --silver:#aeb4bf;
+    --white:#f5f6f8;
+    --green:#3fd67a;
+    --red:#ef6a6a;
+    --radius:18px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--white);
+    font-family:'Inter', sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.02em; }
+  .serif{ font-family:'Fraunces', serif; }
+  a{ color:inherit; text-decoration:none; }
+  img{ max-width:100%; display:block; }
+
+  /* ===== NAV ===== */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 5vw;
+    backdrop-filter: blur(16px) saturate(140%);
+    background: rgba(10,10,13,0.55);
+    border-bottom:1px solid var(--hair);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand img{ height:30px; width:30px; object-fit:contain; }
+  .brand span{ font-size:15px; letter-spacing:0.06em; font-weight:600; }
+  .brand small{ display:block; font-size:9px; color:var(--gold); letter-spacing:0.18em; font-weight:500; }
+  nav.links{ display:flex; gap:36px; font-size:13.5px; color:var(--silver); }
+  nav.links a:hover{ color:var(--white); }
+  .nav-cta{
+    padding:9px 20px; border:1px solid var(--gold); border-radius:999px;
+    font-size:13px; font-weight:500; color:var(--gold-bright);
+    transition:all .25s ease;
+  }
+  .nav-cta:hover{ background:var(--gold); color:#161200; }
+  .nav-menu-toggle{ display:none; }
+
+  /* ===== HERO ===== */
+  .hero{
+    min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:140px 6vw 100px;
+    position:relative;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(60% 50% at 50% 8%, rgba(201,162,39,0.16), transparent 70%),
+      radial-gradient(40% 30% at 85% 90%, rgba(201,162,39,0.08), transparent 70%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-size:12px; letter-spacing:0.24em; text-transform:uppercase;
+    color:var(--gold); font-weight:600; margin-bottom:22px;
+    display:flex; align-items:center; gap:10px; z-index:1;
+  }
+  .eyebrow::before, .eyebrow::after{ content:""; width:26px; height:1px; background:var(--gold); opacity:.6; }
+  .hero h1{
+    font-size:clamp(40px, 6.4vw, 92px);
+    line-height:1.02;
+    font-weight:600;
+    max-width:16ch;
+    z-index:1;
+  }
+  .hero h1 em{ font-style:italic; font-family:'Fraunces', serif; color:var(--gold-bright); font-weight:500; }
+  .hero p.lead{
+    margin-top:26px; max-width:560px; font-size:18px; line-height:1.6;
+    color:var(--silver); font-weight:300; z-index:1;
+  }
+  .hero-ctas{ display:flex; gap:16px; margin-top:42px; z-index:1; flex-wrap:wrap; justify-content:center; }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color:#171200; font-weight:600; font-size:15px;
+    padding:15px 30px; border-radius:999px;
+    box-shadow:0 8px 30px rgba(201,162,39,0.28);
+    transition:transform .25s ease;
+  }
+  .btn-primary:hover{ transform:translateY(-2px); }
+  .btn-ghost{
+    border:1px solid rgba(255,255,255,0.18); color:var(--white);
+    font-weight:500; font-size:15px; padding:15px 28px; border-radius:999px;
+    transition:all .25s ease;
+  }
+  .btn-ghost:hover{ border-color:var(--gold); background:rgba(201,162,39,0.08); }
+
+  /* ticker */
+  .ticker-wrap{
+    margin-top:70px; width:100%; max-width:900px; overflow:hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+    z-index:1;
+  }
+  .ticker{ display:flex; gap:26px; width:max-content; animation:scroll 22s linear infinite; }
+  @keyframes scroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .candle{ width:8px; border-radius:2px; align-self:flex-end; }
+  .ticker-group{ display:flex; align-items:flex-end; gap:8px; height:54px; }
+
+  /* ===== TRUST BAR ===== */
+  .trustbar{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:0;
+    border-top:1px solid var(--hair); border-bottom:1px solid var(--hair);
+    padding:26px 6vw;
+  }
+  .trustbar div{
+    padding:6px 28px; font-size:12.5px; letter-spacing:0.05em; color:var(--silver);
+    border-right:1px solid var(--hair);
+    display:flex; align-items:center; gap:8px;
+  }
+  .trustbar div:last-child{ border-right:none; }
+  .trustbar span.dot{ width:5px; height:5px; border-radius:50%; background:var(--gold); display:inline-block; }
+
+  /* ===== SECTION shared ===== */
+  section{ padding:130px 6vw; position:relative; }
+  .section-head{ max-width:640px; margin:0 auto 64px; text-align:center; }
+  .section-head .eyebrow{ justify-content:center; }
+  .section-head h2{ font-size:clamp(30px,4vw,52px); font-weight:600; line-height:1.1; margin-top:14px; }
+  .section-head p{ margin-top:18px; color:var(--silver); font-size:16.5px; line-height:1.6; font-weight:300; }
+
+  /* ===== RESULTS ===== */
+  .results{ background:var(--panel); border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); }
+  .stat-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:18px;
+    max-width:1160px; margin:0 auto;
+  }
+  .stat-card{
+    background:var(--panel-2); border:1px solid var(--hair); border-radius:var(--radius);
+    padding:26px 22px; position:relative; overflow:hidden;
+    transition:border-color .25s ease, transform .25s ease;
+  }
+  .stat-card:hover{ border-color:rgba(201,162,39,0.5); transform:translateY(-4px); }
+  .stat-card .pair{ font-size:12px; color:var(--silver); letter-spacing:0.06em; font-weight:500; }
+  .stat-card .amount{ font-family:'Fraunces', serif; font-size:30px; font-weight:500; color:var(--green); margin-top:10px; }
+  .stat-card .period{ font-size:11.5px; color:#6c7280; margin-top:10px; }
+  .results-summary{
+    max-width:1160px; margin:44px auto 0; display:flex; justify-content:space-between;
+    flex-wrap:wrap; gap:20px; border-top:1px solid var(--hair); padding-top:30px;
+  }
+  .results-summary .item{ text-align:left; }
+  .results-summary .item h3{ font-family:'Fraunces', serif; font-size:26px; color:var(--gold-bright); font-weight:500; }
+  .results-summary .item span{ font-size:12px; color:var(--silver); text-transform:uppercase; letter-spacing:.06em; }
+  .disclaimer-note{
+    max-width:1160px; margin:34px auto 0; font-size:12px; color:#6c7280; line-height:1.6;
+    border-left:2px solid var(--gold); padding-left:16px;
+  }
+
+  /* ===== HOW IT WORKS ===== */
+  .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:28px; max-width:1100px; margin:0 auto; }
+  .step{ padding:34px 26px; border:1px solid var(--hair); border-radius:var(--radius); background:linear-gradient(160deg, rgba(201,162,39,0.05), transparent); }
+  .step .mark{ font-family:'Fraunces', serif; font-style:italic; color:var(--gold); font-size:15px; }
+  .step h3{ margin-top:16px; font-size:20px; font-weight:600; }
+  .step p{ margin-top:10px; color:var(--silver); font-size:14.5px; line-height:1.6; font-weight:300; }
+
+  /* ===== TRADER BIO ===== */
+  .trader{
+    display:grid; grid-template-columns:0.8fr 1.2fr; gap:70px; align-items:center;
+    max-width:1080px; margin:0 auto;
+  }
+  .trader-photo{
+    position:relative; border-radius:26px; overflow:hidden;
+    border:1px solid var(--hair);
+    aspect-ratio:4/5;
+  }
+  .trader-photo img{ width:100%; height:100%; object-fit:cover; filter:grayscale(15%) contrast(1.05); }
+  .trader-photo::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(0deg, rgba(10,10,13,0.75), transparent 45%);
+  }
+  .trader-photo .badge{
+    position:absolute; bottom:18px; left:18px; z-index:2;
+    background:rgba(10,10,13,0.7); backdrop-filter:blur(6px);
+    border:1px solid var(--hair); padding:8px 14px; border-radius:999px;
+    font-size:11.5px; color:var(--gold-bright); letter-spacing:.04em;
+  }
+  .trader-copy .eyebrow{ justify-content:flex-start; }
+  .trader-copy .eyebrow::after{ display:none; }
+  .trader-copy h2{ font-size:clamp(28px,3.2vw,42px); font-weight:600; margin-top:14px; }
+  .trader-copy p{ margin-top:20px; color:var(--silver); font-size:16px; line-height:1.75; font-weight:300; }
+  .trader-copy .quote{
+    margin-top:26px; padding-left:20px; border-left:2px solid var(--gold);
+    font-family:'Fraunces', serif; font-style:italic; font-size:18px; color:var(--cream);
+  }
+
+  /* ===== BOT FEATURES ===== */
+  .features{ background:var(--panel); border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); }
+  .feature-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--hair); max-width:1100px; margin:0 auto; border-radius:var(--radius); overflow:hidden; }
+  .feature{ background:var(--ink); padding:40px 36px; }
+  .feature h3{ font-size:19px; font-weight:600; display:flex; align-items:center; gap:10px; }
+  .feature h3::before{ content:""; width:8px; height:8px; border-radius:2px; background:var(--gold); display:inline-block; }
+  .feature p{ margin-top:12px; color:var(--silver); font-size:14.5px; line-height:1.7; font-weight:300; }
+
+  /* ===== CTA ===== */
+  .cta{ text-align:center; }
+  .cta h2{ font-size:clamp(32px,5vw,60px); font-weight:600; max-width:14ch; margin:0 auto; }
+  .cta p{ color:var(--silver); margin-top:18px; font-size:16.5px; font-weight:300; }
+  .cta .hero-ctas{ margin-top:38px; }
+
+  /* ===== FOOTER ===== */
+  footer{ padding:60px 6vw 40px; border-top:1px solid var(--hair); }
+  .foot-top{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:40px; max-width:1160px; margin:0 auto; }
+  .foot-brand{ max-width:320px; }
+  .foot-brand .brand{ margin-bottom:14px; }
+  .foot-brand p{ color:#7b8090; font-size:13px; line-height:1.7; }
+  .foot-cols{ display:flex; gap:60px; flex-wrap:wrap; }
+  .foot-col h4{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+  .foot-col a{ display:block; color:#9aa0ac; font-size:13.5px; margin-bottom:10px; }
+  .foot-col a:hover{ color:var(--white); }
+  .risk-box{
+    max-width:1160px; margin:50px auto 0; padding-top:30px; border-top:1px solid var(--hair);
+    font-size:11.5px; color:#5f6472; line-height:1.7;
+  }
+  .foot-bottom{
+    max-width:1160px; margin:26px auto 0; display:flex; justify-content:space-between;
+    font-size:12px; color:#5f6472; flex-wrap:wrap; gap:10px;
+  }
+
+  /* ===== GALLERY (3D tilt) ===== */
+  .gallery{ background:var(--panel); border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); }
+  .gallery-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:30px;
+    max-width:1200px; margin:0 auto; perspective:1400px;
+  }
+  .gallery-card{
+    position:relative; border-radius:20px; overflow:hidden;
+    background:var(--panel-2); border:1px solid var(--hair);
+    transform-style:preserve-3d; will-change:transform;
+    transition:transform .12s ease-out, box-shadow .3s ease, border-color .3s ease;
+    cursor:pointer;
+  }
+  .gallery-card:hover{
+    border-color:rgba(201,162,39,0.55);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,162,39,0.15);
+    z-index:5;
+  }
+  .gallery-card .frame{
+    position:relative; overflow:hidden; aspect-ratio:9/16.3;
+    transform:translateZ(0);
+  }
+  .gallery-card img{
+    width:100%; height:100%; object-fit:cover; object-position:top;
+    transform:translateZ(0) scale(1);
+    transition:transform .5s ease;
+  }
+  .gallery-card:hover img{ transform:scale(1.07); }
+  .gallery-card .glare{
+    position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(120deg, rgba(255,255,255,0.16), transparent 45%);
+    opacity:0; transition:opacity .3s ease; mix-blend-mode:overlay;
+  }
+  .gallery-card:hover .glare{ opacity:1; }
+  .gallery-card .cap{
+    position:absolute; left:0; right:0; bottom:0; padding:16px 16px 14px;
+    background:linear-gradient(0deg, rgba(6,6,8,0.92), transparent);
+    transform:translateY(70%); transition:transform .35s ease;
+    transform-style:flat;
+  }
+  .gallery-card:hover .cap{ transform:translateY(0); }
+  .gallery-card .cap .tag{ font-size:10.5px; letter-spacing:.08em; color:var(--gold-bright); text-transform:uppercase; }
+  .gallery-card .cap .val{ font-family:'Fraunces', serif; font-size:19px; color:var(--green); margin-top:4px; }
+  .gallery-note{ text-align:center; margin-top:40px; font-size:12px; color:#6c7280; }
+
+  /* ===== BOT MASCOT ===== */
+  .bot-section{ overflow:visible; }
+  .bot-wrap{
+    display:grid; grid-template-columns:0.85fr 1.15fr; gap:70px; align-items:center;
+    max-width:1080px; margin:0 auto;
+  }
+  .bot-stage{
+    position:relative; display:flex; align-items:center; justify-content:center;
+    min-height:420px;
+  }
+  .bot-glow{
+    position:absolute; width:320px; height:320px; border-radius:50%;
+    background:radial-gradient(circle, rgba(201,162,39,0.28), transparent 70%);
+    filter:blur(10px); animation:pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ transform:scale(1); opacity:.8; } 50%{ transform:scale(1.12); opacity:1; } }
+  .bot{
+    position:relative; width:210px; animation:float 5s ease-in-out infinite;
+  }
+  @keyframes float{ 0%,100%{ transform:translateY(0px);} 50%{ transform:translateY(-16px);} }
+  .bot .antenna{ width:3px; height:26px; background:var(--gold); margin:0 auto; border-radius:2px; position:relative; }
+  .bot .antenna::after{
+    content:""; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
+    width:11px; height:11px; border-radius:50%; background:var(--gold-bright);
+    box-shadow:0 0 16px 4px rgba(232,198,90,0.7);
+  }
+  .bot .head{
+    width:120px; height:88px; margin:6px auto 0; border-radius:26px;
+    background:linear-gradient(160deg, #2a2d34, #101115 70%);
+    border:1px solid rgba(201,162,39,0.4);
+    box-shadow:inset 0 2px 6px rgba(255,255,255,0.06), 0 10px 24px rgba(0,0,0,0.5);
+    position:relative;
+  }
+  .bot .visor{
+    position:absolute; top:30px; left:14px; right:14px; height:26px; border-radius:14px;
+    background:linear-gradient(90deg, #d4af37, #f3e3a2 45%, #d4af37);
+    box-shadow:0 0 20px 3px rgba(232,198,90,0.55);
+    display:flex; align-items:center; justify-content:space-around; padding:0 14px;
+  }
+  .bot .visor i{ width:8px; height:8px; border-radius:50%; background:#141212; opacity:.85; }
+  .bot .neck{ width:26px; height:14px; margin:0 auto; background:#1c1d22; border:1px solid rgba(201,162,39,0.3); }
+  .bot .torso{
+    width:168px; height:150px; margin:0 auto; border-radius:34px 34px 30px 30px;
+    background:linear-gradient(160deg, #24262c, #0c0d10 75%);
+    border:1px solid rgba(201,162,39,0.35);
+    box-shadow:inset 0 3px 8px rgba(255,255,255,0.05), 0 20px 40px rgba(0,0,0,0.55);
+    position:relative; display:flex; align-items:flex-start; justify-content:center; padding-top:20px;
+  }
+  .bot .chest-plate{
+    width:76px; height:76px; border-radius:14px;
+    background:radial-gradient(circle at 35% 30%, #1b1c20, #050506 80%);
+    border:1px solid rgba(201,162,39,0.55);
+    box-shadow:0 0 22px rgba(201,162,39,0.25), inset 0 0 12px rgba(0,0,0,0.6);
+    display:flex; align-items:center; justify-content:center; padding:9px;
+  }
+  .bot .chest-plate img{ width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 6px rgba(232,198,90,0.4)); }
+  .bot .arm{
+    position:absolute; top:64px; width:16px; height:96px; border-radius:10px;
+    background:linear-gradient(180deg, #24262c, #0c0d10);
+    border:1px solid rgba(201,162,39,0.3);
+  }
+  .bot .arm.l{ left:-2px; transform:rotate(8deg); }
+  .bot .arm.r{ right:-2px; transform:rotate(-8deg); }
+  .bot .legs{ display:flex; justify-content:center; gap:26px; margin-top:6px; }
+  .bot .leg{
+    width:20px; height:56px; border-radius:8px;
+    background:linear-gradient(180deg, #24262c, #0c0d10);
+    border:1px solid rgba(201,162,39,0.3);
+  }
+  .bot-copy .eyebrow{ justify-content:flex-start; }
+  .bot-copy .eyebrow::after{ display:none; }
+  .bot-copy h2{ font-size:clamp(28px,3.2vw,42px); font-weight:600; margin-top:14px; }
+  .bot-copy p{ margin-top:20px; color:var(--silver); font-size:16px; line-height:1.75; font-weight:300; }
+  .bot-specs{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:28px; }
+  .bot-specs div{
+    border:1px solid var(--hair); border-radius:12px; padding:14px 16px;
+    background:var(--panel-2);
+  }
+  .bot-specs div h4{ font-size:12px; color:var(--gold); letter-spacing:.05em; text-transform:uppercase; }
+  .bot-specs div p{ margin-top:6px; font-size:13.5px; color:var(--silver); font-weight:300; }
+
+  @media (max-width:900px){
+    nav.links{ display:none; }
+    .stat-grid{ grid-template-columns:repeat(2,1fr); }
+    .steps{ grid-template-columns:1fr; }
+    .trader{ grid-template-columns:1fr; gap:40px; }
+    .feature-grid{ grid-template-columns:1fr; }
+    .trustbar div{ padding:6px 16px; font-size:11.5px; }
+    .gallery-grid{ grid-template-columns:repeat(2,1fr); }
+    .bot-wrap{ grid-template-columns:1fr; gap:20px; text-align:center; }
+    .bot-copy .eyebrow{ justify-content:center; }
+    .bot-specs{ text-align:left; }
+  }
+  @media (max-width:520px){
+    .stat-grid{ grid-template-columns:1fr 1fr; }
+    section{ padding:90px 6vw; }
+    .gallery-grid{ grid-template-columns:1fr 1fr; gap:16px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ticker{ animation:none; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="images/logo.png" alt="Trinity FX Global logo">
+    <div>
+      <span>TRINITY FX GLOBAL</span>
+      <small>MEET TRADER · ALGO BOT</small>
+    </div>
+  </div>
+  <nav class="links">
+    <a href="#results">Results</a>
+    <a href="#gallery">Statements</a>
+    <a href="#how">How it works</a>
+    <a href="#trader">Meet the Trader</a>
+    <a href="#bot">Meet the Bot</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <a href="#contact" class="nav-cta">Get Started</a>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Algorithmic Execution · Human Oversight</div>
+  <h1 class="display">Meet Trader.<br>Built to read the market, <em>every second.</em></h1>
+  <p class="lead">Trinity FX Global's algo bot places disciplined, rules-based trades across major and cross pairs, around the clock — while a real trading desk keeps watch over every position.</p>
+  <div class="hero-ctas">
+    <a href="#results" class="btn-primary">See live account results</a>
+    <a href="#contact" class="btn-ghost">Talk to the desk</a>
+  </div>
+
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker"></div>
+  </div>
+</section>
+
+<div class="trustbar">
+  <div><span class="dot"></span>24/5 Market Coverage</div>
+  <div><span class="dot"></span>Multi-Pair Execution</div>
+  <div><span class="dot"></span>Rules-Based Risk Sizing</div>
+  <div><span class="dot"></span>Transparent Statement Reporting</div>
+</div>
+
+<section id="results" class="results">
+  <div class="section-head">
+    <div class="eyebrow">Verified Account Activity</div>
+    <h2 class="display">Real accounts. Real statements.</h2>
+    <p>A snapshot of gross trading profit pulled directly from live account statements run by the Meet Trader algo across a recent trading week — GBP, EUR, USD, AUD and JPY crosses.</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="pair">GBPCAD · EURCHF · GBPAUD</div>
+      <div class="amount">+$572.54</div>
+      <div class="period">Weekly statement · Aug 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="pair">GBPCAD · Monthly Book</div>
+      <div class="amount">+$6,303.00</div>
+      <div class="period">Monthly statement · Aug 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="pair">USDCHF · GBPJPY · AUDJPY</div>
+      <div class="amount">+$1,627.49</div>
+      <div class="period">Weekly statement · Aug 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="pair">EURJPY · GBPCAD</div>
+      <div class="amount">+$648.87</div>
+      <div class="period">Weekly statement · Aug 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="pair">GBPJPY · USDCHF · GBPNZD</div>
+      <div class="amount">+$630.24</div>
+      <div class="period">Weekly statement · Aug 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="pair">EURCHF · GBPJPY · EURJPY</div>
+      <div class="amount">+$645.64</div>
+      <div class="period">Weekly statement · Aug 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="pair">GBPCAD-ECN · EURJPY-ECN</div>
+      <div class="amount">+$499.58</div>
+      <div class="period">Weekly statement · Aug 2026</div>
+    </div>
+    <div class="stat-card">
+      <div class="pair">GBPCAD · EURUSD · GBPAUD</div>
+      <div class="amount">+$577.09</div>
+      <div class="period">Weekly statement · Aug 2026</div>
+    </div>
+  </div>
+
+  <div class="results-summary">
+    <div class="item"><h3>16</h3><span>Live accounts sampled</span></div>
+    <div class="item"><h3>10+</h3><span>Currency pairs traded</span></div>
+    <div class="item"><h3>24/5</h3><span>Market monitoring</span></div>
+    <div class="item"><h3>0.02–0.10</h3><span>Typical lot sizing per trade</span></div>
+  </div>
+
+  <p class="disclaimer-note">Figures shown are gross trading profit as recorded on individual account statements for the periods noted, before withdrawals, deposits and administration fees, which vary by account. Trading forex carries a high level of risk and past results — including those shown here — do not guarantee future performance. See full risk disclosure below.</p>
+</section>
+
+<section id="gallery" class="gallery">
+  <div class="section-head">
+    <div class="eyebrow">Live Statement Gallery</div>
+    <h2 class="display">Every trade, on the record.</h2>
+    <p>Sixteen live account statements captured straight from the trading terminal — hover to see each account's period profit. Nothing hidden, nothing staged.</p>
+  </div>
+
+  <div class="gallery-grid" id="galleryGrid">
+    <div class="gallery-card"><div class="frame"><img src="images/shot-1.jpg" alt="Live account statement 1" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$572.54</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-2.jpg" alt="Live account statement 2" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$291.81</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-3.jpg" alt="Live account statement 3" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$223.07</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-4.jpg" alt="Live account statement 4" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Monthly Statement</div><div class="val">+$6,303.00</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-5.jpg" alt="Live account statement 5" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$406.71</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-6.jpg" alt="Live account statement 6" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$648.87</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-7.jpg" alt="Live account statement 7" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$246.93</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-8.jpg" alt="Live account statement 8" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$499.58</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-9.jpg" alt="Live account statement 9" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$472.39</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-10.jpg" alt="Live account statement 10" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$353.97</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-11.jpg" alt="Live account statement 11" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$300.75</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-12.jpg" alt="Live account statement 12" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$577.09</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-13.jpg" alt="Live account statement 13" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$426.80</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-14.jpg" alt="Live account statement 14" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$1,627.49</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-15.jpg" alt="Live account statement 15" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$645.64</div></div></div>
+    <div class="gallery-card"><div class="frame"><img src="images/shot-16.jpg" alt="Live account statement 16" loading="lazy"><div class="glare"></div></div>
+      <div class="cap"><div class="tag">Weekly Statement</div><div class="val">+$630.24</div></div></div>
+  </div>
+  <p class="gallery-note">Screenshots are unedited exports from the trading terminal's History tab. Balances reflect each account's own deposits, withdrawals and fees.</p>
+</section>
+
+<section id="how">
+  <div class="section-head">
+    <div class="eyebrow">How It Works</div>
+    <h2 class="display">Three moving parts, one discipline.</h2>
+    <p>No guesswork, no emotion — the bot follows a fixed set of entry, exit and sizing rules on every trade it takes.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="mark serif">Connect</div>
+      <h3>Link your trading account</h3>
+      <p>Your broker account stays in your name and under your control. The bot is granted trade execution only — never withdrawal access.</p>
+    </div>
+    <div class="step">
+      <div class="mark serif">Execute</div>
+      <h3>The algo trades your rules</h3>
+      <p>Positions are opened and closed automatically across major, minor and cross pairs, sized according to preset risk limits — day and night.</p>
+    </div>
+    <div class="step">
+      <div class="mark serif">Review</div>
+      <h3>Track every trade, in real time</h3>
+      <p>Every fill is logged to your statement — entry, exit, lot size, and P/L — so you can review exactly what the bot did and why.</p>
+    </div>
+  </div>
+</section>
+
+<section id="trader">
+  <div class="trader">
+    <div class="trader-photo">
+      <img src="images/trader.jpg" alt="Lead strategist at Trinity FX Global">
+      <div class="badge">Lead Strategist, Trinity FX Global</div>
+    </div>
+    <div class="trader-copy">
+      <div class="eyebrow">Meet the Trader</div>
+      <h2 class="display">The desk behind the bot.</h2>
+      <p>Meet Trader isn't just an algorithm — it's the product of a trading desk that watches every account it runs on. The Trinity FX Global team sets the risk parameters, monitors live exposure across pairs, and steps in when markets move outside the bot's rules.</p>
+      <p>Every strategy the bot executes has been tested across market conditions before it ever touches a live account — the goal is consistency and capital discipline, not chasing a single big win.</p>
+      <div class="quote">"Trade. Grow. Succeed. — that's the discipline we build into every line of the bot, and every account we oversee."</div>
+    </div>
+  </div>
+</section>
+
+<section id="bot" class="bot-section">
+  <div class="bot-wrap">
+    <div class="bot-stage">
+      <div class="bot-glow"></div>
+      <div class="bot">
+        <div class="antenna"></div>
+        <div class="head">
+          <div class="visor"><i></i><i></i><i></i></div>
+        </div>
+        <div class="neck"></div>
+        <div class="torso">
+          <div class="arm l"></div>
+          <div class="arm r"></div>
+          <div class="chest-plate"><img src="images/logo.png" alt="Trinity FX Global emblem"></div>
+        </div>
+        <div class="legs">
+          <div class="leg"></div>
+          <div class="leg"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bot-copy">
+      <div class="eyebrow">Meet the Bot</div>
+      <h2 class="display">The engine wearing our emblem.</h2>
+      <p>Every account you saw in the gallery above was executed by this system — the Meet Trader algo, running around the clock under the Trinity FX Global badge. It doesn't sleep, doesn't hesitate, and doesn't deviate from the risk rules set by the desk.</p>
+      <div class="bot-specs">
+        <div><h4>Uptime</h4><p>24/5 market monitoring</p></div>
+        <div><h4>Oversight</h4><p>Human desk review daily</p></div>
+        <div><h4>Sizing</h4><p>Fixed lot & risk limits</p></div>
+        <div><h4>Reporting</h4><p>Per-trade statement logs</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="section-head">
+    <div class="eyebrow">Why Trinity FX Global</div>
+    <h2 class="display">Built for trust, not just trades.</h2>
+  </div>
+  <div class="feature-grid">
+    <div class="feature">
+      <h3>Smart Trading</h3>
+      <p>Rules-based entries and exits remove emotion from the decision — the bot trades the plan, not the panic.</p>
+    </div>
+    <div class="feature">
+      <h3>Global Markets</h3>
+      <p>Coverage across GBP, EUR, USD, AUD, NZD and JPY crosses means the bot isn't waiting on a single market to move.</p>
+    </div>
+    <div class="feature">
+      <h3>Trust & Transparency</h3>
+      <p>Full statement access, per-trade logging, and a desk you can reach — nothing runs behind a black box.</p>
+    </div>
+    <div class="feature">
+      <h3>Financial Freedom</h3>
+      <p>Automated execution frees you from watching charts all day, without handing over control of your capital.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="contact">
+  <div class="eyebrow" style="justify-content:center;">Ready When You Are</div>
+  <h2 class="display">See what the bot can do<br>with your account.</h2>
+  <p>Book a walkthrough with the Trinity FX Global desk — no obligation, just the numbers.</p>
+  <div class="hero-ctas">
+    <a href="#" class="btn-primary">Book a walkthrough</a>
+    <a href="#" class="btn-ghost">Download account statements</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-top">
+    <div class="foot-brand">
+      <div class="brand">
+        <img src="images/logo.png" alt="Trinity FX Global logo">
+        <div><span>TRINITY FX GLOBAL</span><small>MEET TRADER · ALGO BOT</small></div>
+      </div>
+      <p>Trade · Grow · Succeed. Algorithmic forex execution with a human trading desk behind every account.</p>
+    </div>
+    <div class="foot-cols">
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="#results">Results</a>
+        <a href="#how">How it works</a>
+        <a href="#trader">Meet the Trader</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#contact">Contact desk</a>
+        <a href="#">Risk disclosure</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="risk-box">
+    <strong>Risk disclosure:</strong> Trading foreign exchange on margin carries a high level of risk and may not be suitable for all investors. The high degree of leverage can work against you as well as for you. Before deciding to trade, or to use an automated trading system such as the one described on this page, you should carefully consider your investment objectives, level of experience, and risk appetite. There is a possibility that you could sustain a loss of some or all of your initial investment; you should not invest money that you cannot afford to lose. Account statement figures shown on this page reflect historical results for specific accounts and periods and are not representative of all accounts or future performance.
+  </div>
+
+  <div class="foot-bottom">
+    <span>© 2026 Trinity FX Global. All rights reserved.</span>
+    <span>Trade · Grow · Succeed</span>
+  </div>
+</footer>
+
+<script>
+  // build candlestick ticker matching the logo's motif
+  const wrap = document.getElementById('ticker');
+  const colors = ['#c9a227', '#e8c65a', '#3fd67a', '#ef6a6a', '#f3ead3'];
+  let html = '';
+  for (let g = 0; g < 2; g++){
+    for (let i = 0; i < 26; i++){
+      const h = 14 + Math.random()*40;
+      const c = colors[Math.floor(Math.random()*colors.length)];
+      html += `<div class="ticker-group"><div class="candle" style="height:${h}px;background:${c};opacity:${0.5+Math.random()*0.5}"></div></div>`;
+    }
+  }
+  wrap.innerHTML = html;
+
+  // 3D tilt-on-hover for gallery cards
+  document.querySelectorAll('.gallery-card').forEach(card => {
+    const strength = 14;
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `rotateY(${x*strength}deg) rotateX(${-y*strength}deg) scale(1.04) translateZ(0)`;
+      const glare = card.querySelector('.glare');
+      if (glare) glare.style.background =
+        `radial-gradient(circle at ${(x+0.5)*100}% ${(y+0.5)*100}%, rgba(255,255,255,0.25), transparent 55%)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateY(0) rotateX(0) scale(1) translateZ(0)';
+    });
+  });
+</script>
+
+</body>
+</html>
