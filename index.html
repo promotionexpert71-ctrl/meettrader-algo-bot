@@ -59,6 +59,43 @@
   .nav-cta:hover{ background:var(--gold); color:#161200; }
   .nav-menu-toggle{ display:none; }
 
+  /* ===== SOCIAL ICONS ===== */
+  .social-icons{ display:flex; align-items:center; gap:10px; }
+  .social-icons a{
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--hair); display:flex; align-items:center; justify-content:center;
+    color:var(--silver); transition:all .25s ease;
+  }
+  .social-icons a:hover{ border-color:var(--gold); color:var(--gold-bright); background:rgba(201,162,39,0.1); transform:translateY(-2px); }
+  .social-icons svg{ width:17px; height:17px; }
+  .header-actions{ display:flex; align-items:center; gap:18px; }
+
+  /* ===== WHATSAPP CONTACT CARDS ===== */
+  .whatsapp-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:18px;
+    max-width:900px; margin:44px auto 0;
+  }
+  .wa-card{
+    display:flex; align-items:center; gap:14px;
+    padding:18px 20px; border:1px solid var(--hair); border-radius:16px;
+    background:var(--panel-2); transition:all .25s ease;
+  }
+  .wa-card:hover{ border-color:#25D366; transform:translateY(-3px); box-shadow:0 12px 30px rgba(37,211,102,0.15); }
+  .wa-card .flag{ font-size:26px; line-height:1; }
+  .wa-card .wa-info{ flex:1; text-align:left; }
+  .wa-card .wa-info .country{ font-size:11px; color:var(--silver); letter-spacing:.05em; text-transform:uppercase; }
+  .wa-card .wa-info .number{ font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:600; color:var(--white); margin-top:2px; }
+  .wa-card .wa-icon{ color:#25D366; flex-shrink:0; }
+  .wa-card .wa-icon svg{ width:26px; height:26px; }
+  .social-follow{
+    display:flex; align-items:center; justify-content:center; gap:16px;
+    margin-top:38px;
+  }
+  .social-follow span{ font-size:12.5px; color:var(--silver); }
+  .social-follow .social-icons a{ width:42px; height:42px; }
+  .social-follow .social-icons svg{ width:19px; height:19px; }
+  .foot-social{ display:flex; gap:10px; margin-top:16px; }
+
   /* ===== HERO ===== */
   .hero{
     min-height:100svh;
@@ -376,11 +413,13 @@
     .bot-wrap{ grid-template-columns:1fr; gap:20px; text-align:center; }
     .bot-copy .eyebrow{ justify-content:center; }
     .bot-specs{ text-align:left; }
+    .whatsapp-grid{ grid-template-columns:1fr; }
   }
   @media (max-width:520px){
     .stat-grid{ grid-template-columns:1fr 1fr; }
     section{ padding:90px 6vw; }
     .gallery-grid{ grid-template-columns:1fr 1fr; gap:16px; }
+    .header-actions .social-icons{ display:none; }
   }
   @media (prefers-reduced-motion: reduce){
     .ticker{ animation:none; }
@@ -406,7 +445,17 @@
     <a href="#bot">Meet the Bot</a>
     <a href="#contact">Contact</a>
   </nav>
-  <a href="#contact" class="nav-cta">Get Started</a>
+  <div class="header-actions">
+    <div class="social-icons">
+      <a href="https://www.instagram.com/trinityfxglobal" target="_blank" rel="noopener" aria-label="Trinity FX Global on Instagram" title="@trinityfxglobal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+      </a>
+      <a href="https://www.instagram.com/tarnwali_meet" target="_blank" rel="noopener" aria-label="Meet Trader on Instagram" title="@tarnwali_meet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+      </a>
+    </div>
+    <a href="#contact" class="nav-cta">Get Started</a>
+  </div>
 </header>
 
 <section class="hero">
@@ -643,6 +692,36 @@
     <a href="#" class="btn-primary">Book a walkthrough</a>
     <a href="#" class="btn-ghost">Download account statements</a>
   </div>
+
+  <div class="whatsapp-grid">
+    <a href="https://wa.me/971505913690" target="_blank" rel="noopener" class="wa-card">
+      <span class="flag">🇦🇪</span>
+      <div class="wa-info"><div class="country">UAE</div><div class="number">+971 50 591 3690</div></div>
+      <span class="wa-icon"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.7 4.61 1.91 6.48L4 29l7.72-1.87A11.94 11.94 0 0 0 16 27c6.628 0 12-5.373 12-12S22.629 3 16.001 3zm0 21.6c-1.98 0-3.83-.55-5.41-1.5l-.39-.23-4.58 1.11 1.14-4.46-.25-.4A9.57 9.57 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16.001 24.6zm5.79-7.94c-.32-.16-1.88-.93-2.17-1.03-.29-.1-.5-.16-.71.16-.21.32-.81 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.58-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.71-.97-2.34-.26-.61-.52-.53-.71-.54-.18-.01-.4-.01-.61-.01s-.56.08-.85.4c-.29.32-1.12 1.1-1.12 2.67 0 1.57 1.15 3.09 1.31 3.3.16.21 2.26 3.45 5.48 4.84.77.33 1.36.53 1.83.68.77.24 1.47.21 2.02.13.62-.09 1.88-.77 2.14-1.51.27-.74.27-1.37.19-1.5-.08-.14-.29-.21-.61-.37z"/></svg></span>
+    </a>
+    <a href="https://wa.me/34612462490" target="_blank" rel="noopener" class="wa-card">
+      <span class="flag">🇪🇸</span>
+      <div class="wa-info"><div class="country">Spain</div><div class="number">+34 612 462 490</div></div>
+      <span class="wa-icon"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.7 4.61 1.91 6.48L4 29l7.72-1.87A11.94 11.94 0 0 0 16 27c6.628 0 12-5.373 12-12S22.629 3 16.001 3zm0 21.6c-1.98 0-3.83-.55-5.41-1.5l-.39-.23-4.58 1.11 1.14-4.46-.25-.4A9.57 9.57 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16.001 24.6zm5.79-7.94c-.32-.16-1.88-.93-2.17-1.03-.29-.1-.5-.16-.71.16-.21.32-.81 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.58-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.71-.97-2.34-.26-.61-.52-.53-.71-.54-.18-.01-.4-.01-.61-.01s-.56.08-.85.4c-.29.32-1.12 1.1-1.12 2.67 0 1.57 1.15 3.09 1.31 3.3.16.21 2.26 3.45 5.48 4.84.77.33 1.36.53 1.83.68.77.24 1.47.21 2.02.13.62-.09 1.88-.77 2.14-1.51.27-.74.27-1.37.19-1.5-.08-.14-.29-.21-.61-.37z"/></svg></span>
+    </a>
+    <a href="https://wa.me/351912596637" target="_blank" rel="noopener" class="wa-card">
+      <span class="flag">🇵🇹</span>
+      <div class="wa-info"><div class="country">Portugal</div><div class="number">+351 912 596 637</div></div>
+      <span class="wa-icon"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.7 4.61 1.91 6.48L4 29l7.72-1.87A11.94 11.94 0 0 0 16 27c6.628 0 12-5.373 12-12S22.629 3 16.001 3zm0 21.6c-1.98 0-3.83-.55-5.41-1.5l-.39-.23-4.58 1.11 1.14-4.46-.25-.4A9.57 9.57 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16.001 24.6zm5.79-7.94c-.32-.16-1.88-.93-2.17-1.03-.29-.1-.5-.16-.71.16-.21.32-.81 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.58-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.71-.97-2.34-.26-.61-.52-.53-.71-.54-.18-.01-.4-.01-.61-.01s-.56.08-.85.4c-.29.32-1.12 1.1-1.12 2.67 0 1.57 1.15 3.09 1.31 3.3.16.21 2.26 3.45 5.48 4.84.77.33 1.36.53 1.83.68.77.24 1.47.21 2.02.13.62-.09 1.88-.77 2.14-1.51.27-.74.27-1.37.19-1.5-.08-.14-.29-.21-.61-.37z"/></svg></span>
+    </a>
+  </div>
+
+  <div class="social-follow">
+    <span>Follow the desk:</span>
+    <div class="social-icons">
+      <a href="https://www.instagram.com/trinityfxglobal" target="_blank" rel="noopener" aria-label="Trinity FX Global on Instagram" title="@trinityfxglobal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+      </a>
+      <a href="https://www.instagram.com/tarnwali_meet" target="_blank" rel="noopener" aria-label="Meet Trader on Instagram" title="@tarnwali_meet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+      </a>
+    </div>
+  </div>
 </section>
 
 <footer>
@@ -653,6 +732,19 @@
         <div><span>TRINITY FX GLOBAL</span><small>MEET TRADER · ALGO BOT</small></div>
       </div>
       <p>Trade · Grow · Succeed. Algorithmic forex execution with a human trading desk behind every account.</p>
+      <div class="foot-social">
+        <div class="social-icons">
+          <a href="https://www.instagram.com/trinityfxglobal" target="_blank" rel="noopener" aria-label="Trinity FX Global on Instagram" title="@trinityfxglobal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+          </a>
+          <a href="https://www.instagram.com/tarnwali_meet" target="_blank" rel="noopener" aria-label="Meet Trader on Instagram" title="@tarnwali_meet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+          </a>
+          <a href="https://wa.me/971505913690" target="_blank" rel="noopener" aria-label="WhatsApp UAE" title="WhatsApp UAE">
+            <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.7 4.61 1.91 6.48L4 29l7.72-1.87A11.94 11.94 0 0 0 16 27c6.628 0 12-5.373 12-12S22.629 3 16.001 3zm0 21.6c-1.98 0-3.83-.55-5.41-1.5l-.39-.23-4.58 1.11 1.14-4.46-.25-.4A9.57 9.57 0 0 1 5.4 15c0-5.85 4.75-10.6 10.6-10.6S26.6 9.15 26.6 15 21.85 24.6 16.001 24.6zm5.79-7.94c-.32-.16-1.88-.93-2.17-1.03-.29-.1-.5-.16-.71.16-.21.32-.81 1.03-1 1.24-.18.21-.37.24-.68.08-.32-.16-1.34-.49-2.55-1.57-.94-.84-1.58-1.87-1.76-2.19-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.71-.97-2.34-.26-.61-.52-.53-.71-.54-.18-.01-.4-.01-.61-.01s-.56.08-.85.4c-.29.32-1.12 1.1-1.12 2.67 0 1.57 1.15 3.09 1.31 3.3.16.21 2.26 3.45 5.48 4.84.77.33 1.36.53 1.83.68.77.24 1.47.21 2.02.13.62-.09 1.88-.77 2.14-1.51.27-.74.27-1.37.19-1.5-.08-.14-.29-.21-.61-.37z"/></svg>
+          </a>
+        </div>
+      </div>
     </div>
     <div class="foot-cols">
       <div class="foot-col">
